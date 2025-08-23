@@ -1,21 +1,13 @@
 import React from 'react';
-import type { Todo } from '../../types/Todo';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { setQuery, setStatus } from '../../features/filterSlice';
+import { Todo } from '../../types/Todo';
 
-interface TodoFilterProps {
-  todos: Todo[];
-  query: string;
-  setQuery: (value: string) => void;
-  status: 'all' | 'active' | 'completed';
-  setStatus: (value: 'all' | 'active' | 'completed') => void;
-}
+export const TodoFilter: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const { query, status } = useAppSelector(state => state.filter);
+  const todos: Todo[] = useAppSelector(state => state.todos.items);
 
-export const TodoFilter: React.FC<TodoFilterProps> = ({
-  todos,
-  query,
-  setQuery,
-  status,
-  setStatus,
-}) => {
   const filteredTodos = todos.filter(todo => {
     const matchesQuery = todo.title.toLowerCase().includes(query.toLowerCase());
     const matchesStatus =
@@ -31,13 +23,13 @@ export const TodoFilter: React.FC<TodoFilterProps> = ({
       <input
         data-cy="searchInput"
         value={query}
-        onChange={e => setQuery(e.target.value)}
+        onChange={e => dispatch(setQuery(e.target.value))}
       />
       {query && (
         <button
           className="delete"
-          data-cy="clear-btn"
-          onClick={() => setQuery('')}
+          data-cy="clearSearchButton"
+          onClick={() => dispatch(setQuery(''))}
         />
       )}
 
@@ -45,7 +37,7 @@ export const TodoFilter: React.FC<TodoFilterProps> = ({
         data-cy="statusSelect"
         value={status}
         onChange={e =>
-          setStatus(e.target.value as 'all' | 'active' | 'completed')
+          dispatch(setStatus(e.target.value as 'all' | 'active' | 'completed'))
         }
       >
         <option value="all">All</option>

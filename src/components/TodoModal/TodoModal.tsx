@@ -1,31 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { Todo } from '../../types/Todo';
+import { useAppSelector, useAppDispatch } from '../../app/hooks';
+import { setCurrentTodo } from '../../features/currentTodoSlice';
 
-interface TodoModalProps {
-  todo: Todo | null;
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-export const TodoModal: React.FC<TodoModalProps> = ({
-  todo,
-  isOpen,
-  onClose,
-}) => {
+export const TodoModal: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const todo = useAppSelector(s => s.currentTodo.selected);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<string | null>(null);
 
   useEffect(() => {
     if (todo) {
       setLoading(true);
+      setUser(null);
       setTimeout(() => {
-        setUser(`User ${todo.id}`);
+        setUser(`User ${todo.userId}`);
         setLoading(false);
       }, 500);
     }
   }, [todo]);
 
-  if (!isOpen || !todo) {
+  if (!todo) {
     return null;
   }
 
@@ -37,7 +31,10 @@ export const TodoModal: React.FC<TodoModalProps> = ({
         <div>
           <h2 data-cy="modal-header">{todo.title}</h2>
           <p data-cy="modal-user">{user}</p>
-          <button data-cy="modal-close" onClick={onClose}>
+          <button
+            data-cy="modal-close"
+            onClick={() => dispatch(setCurrentTodo(null))}
+          >
             Close
           </button>
         </div>

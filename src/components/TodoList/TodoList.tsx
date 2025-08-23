@@ -1,17 +1,12 @@
 import React from 'react';
-import { Todo } from '../../types/Todo';
+import { useAppSelector, useAppDispatch } from '../../app/hooks';
+import { setCurrentTodo } from '../../features/currentTodoSlice';
 
-interface TodoListProps {
-  todos: Todo[];
-  selectedTodoId: number | null;
-  onSelect: (todo: Todo | null) => void;
-}
+export const TodoList: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const todos = useAppSelector(s => s.todos.items);
+  const currentTodo = useAppSelector(s => s.currentTodo.selected);
 
-export const TodoList: React.FC<TodoListProps> = ({
-  todos,
-  selectedTodoId,
-  onSelect,
-}) => {
   return (
     <table>
       <tbody>
@@ -31,11 +26,16 @@ export const TodoList: React.FC<TodoListProps> = ({
               <i
                 data-cy="selectButton"
                 className={
-                  selectedTodoId === todo.id ? 'fas fa-eye-slash' : 'far fa-eye'
+                  currentTodo?.id === todo.id
+                    ? 'fas fa-eye-slash'
+                    : 'far fa-eye'
                 }
                 onClick={() =>
-                  onSelect(selectedTodoId === todo.id ? null : todo)
+                  dispatch(
+                    setCurrentTodo(currentTodo?.id === todo.id ? null : todo),
+                  )
                 }
+                style={{ cursor: 'pointer' }}
               />
             </td>
           </tr>
