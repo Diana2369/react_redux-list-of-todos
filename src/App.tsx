@@ -8,12 +8,13 @@ import { Todo } from './types/Todo';
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { items: isLoading } = useAppSelector(state => state.todos);
+  const { isLoading } = useAppSelector(state => state.todos); // ✅ теперь правильно берём статус загрузки
 
   useEffect(() => {
-    dispatch(setLoading(true));
-    setTimeout(() => {
+    const fetchTodos = async () => {
+      dispatch(setLoading(true));
       try {
+        // Симуляция API-запроса
         const fetchedTodos: Todo[] = [
           {
             id: 1,
@@ -38,12 +39,16 @@ const App: React.FC = () => {
         ];
 
         dispatch(setTodos(fetchedTodos));
-      } catch (err) {
+      } catch (err: unknown) {
         dispatch(setError('Failed to load todos'));
       } finally {
         dispatch(setLoading(false));
       }
-    }, 500);
+    };
+
+    const timeoutId = setTimeout(fetchTodos, 500);
+
+    return () => clearTimeout(timeoutId); // ✅ чистим таймер
   }, [dispatch]);
 
   return (
